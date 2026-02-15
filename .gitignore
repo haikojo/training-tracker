@@ -1,0 +1,13 @@
+# build output
+dist/
+
+# dependencies
+node_modules/
+
+# tool caches
+node_modules/.cache/
+node_modules/.vite/
+*.tsbuildinfo
+
+# OS
+.DS_Store

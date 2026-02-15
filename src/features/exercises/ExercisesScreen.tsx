@@ -1,4 +1,5 @@
 import { FormEvent, useMemo, useRef, useState } from 'react';
+import { ScreenHeader } from '../../components/layout/ScreenHeader';
 import { Button } from '../../components/Button';
 import { TextInput } from '../../components/TextInput';
 import type { Exercise } from '../../domain/types';
@@ -8,6 +9,7 @@ import {
   removeExercise,
   updateExercise
 } from '../../data/repos/exercisesRepo';
+import { filterExercisesByName, toExerciseErrorMessage } from './logic';
 
 interface ExerciseFormState {
   name: string;
@@ -21,22 +23,6 @@ const initialFormState: ExerciseFormState = {
   equipment: ''
 };
 
-function toFriendlyErrorMessage(error: unknown): string {
-  if (!(error instanceof Error)) {
-    return 'Could not save exercise. Please try again.';
-  }
-
-  if (error.message === 'Exercise name cannot be empty.') {
-    return 'Please enter an exercise name.';
-  }
-
-  if (error.message === 'Exercise name must be unique.') {
-    return 'An exercise with this name already exists.';
-  }
-
-  return error.message;
-}
-
 export default function ExercisesScreen() {
   const nameInputRef = useRef<HTMLInputElement>(null);
   const [exercises, setExercises] = useState<Exercise[]>(() => listExercises());
@@ -48,15 +34,10 @@ export default function ExercisesScreen() {
   const [editForm, setEditForm] = useState<ExerciseFormState>(initialFormState);
   const [editError, setEditError] = useState('');
 
-  const filteredExercises = useMemo(() => {
-    const normalizedTerm = searchTerm.trim().toLowerCase();
-
-    if (!normalizedTerm) {
-      return exercises;
-    }
-
-    return exercises.filter((exercise) => exercise.name.toLowerCase().includes(normalizedTerm));
-  }, [exercises, searchTerm]);
+  const filteredExercises = useMemo(
+    () => filterExercisesByName(exercises, searchTerm),
+    [exercises, searchTerm]
+  );
 
   function refreshExercises(): void {
     setExercises(listExercises());
@@ -77,7 +58,7 @@ export default function ExercisesScreen() {
       setQuickAddForm(initialFormState);
       nameInputRef.current?.focus();
     } catch (error) {
-      setQuickAddError(toFriendlyErrorMessage(error));
+      setQuickAddError(toExerciseErrorMessage(error));
     }
   }
 
@@ -110,7 +91,7 @@ export default function ExercisesScreen() {
       refreshExercises();
       cancelEditing();
     } catch (error) {
-      setEditError(toFriendlyErrorMessage(error));
+      setEditError(toExerciseErrorMessage(error));
     }
   }
 
@@ -131,7 +112,7 @@ export default function ExercisesScreen() {
 
   return (
     <section className="page">
-      <h1>Exercises</h1>
+      <ScreenHeader title="Exercises" subtitle="Quick add and manage your library" />
 
       <form className="card form-stack" onSubmit={handleQuickAddSubmit}>
         <h2 className="section-title">Quick Add</h2>

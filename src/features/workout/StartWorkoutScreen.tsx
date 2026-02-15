@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/Button';
+import { ScreenHeader } from '../../components/layout/ScreenHeader';
 import { addSession, getLastSessionForTemplateDay } from '../../data/repos/sessionsRepo';
 import { listRoutines } from '../../data/repos/routinesRepo';
 import type { DayTemplate } from '../../domain/types';
@@ -50,7 +51,15 @@ export default function StartWorkoutScreen() {
   if (routines.length === 0) {
     return (
       <section className="page">
-        <h1>Start Workout</h1>
+        <ScreenHeader
+          title="Start Workout"
+          subtitle="Choose a template day"
+          action={
+            <Link className="inline-link" to="/settings">
+              Settings
+            </Link>
+          }
+        />
         <article className="card">Create a routine first, then start a workout.</article>
       </section>
     );
@@ -58,7 +67,15 @@ export default function StartWorkoutScreen() {
 
   return (
     <section className="page">
-      <h1>Start Workout</h1>
+      <ScreenHeader
+        title="Start Workout"
+        subtitle="Start fresh or use last time as baseline"
+        action={
+          <Link className="inline-link" to="/settings">
+            Settings
+          </Link>
+        }
+      />
 
       <article className="card form-stack">
         <label className="input-field" htmlFor="routineTemplateSelect">

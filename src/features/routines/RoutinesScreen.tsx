@@ -1,9 +1,17 @@
 import { useMemo, useState } from 'react';
 import { Button } from '../../components/Button';
+import { ScreenHeader } from '../../components/layout/ScreenHeader';
 import { TextInput } from '../../components/TextInput';
 import type { DayTemplate, Exercise, PlannedExercise, RoutineTemplate } from '../../domain/types';
 import { listExercises } from '../../data/repos/exercisesRepo';
 import { addRoutine, listRoutines, removeRoutine, updateRoutine } from '../../data/repos/routinesRepo';
+import {
+  getExerciseName,
+  normalizeDayOrder,
+  normalizePlannedExerciseOrder,
+  sortDays,
+  sortPlannedExercises
+} from './logic';
 
 interface PlannedExerciseForm {
   exerciseId: string;
@@ -20,26 +28,6 @@ const defaultPlannedExerciseForm: PlannedExerciseForm = {
   targetWeight: '',
   notes: ''
 };
-
-function sortDays(days: DayTemplate[]): DayTemplate[] {
-  return [...days].sort((a, b) => a.order - b.order);
-}
-
-function sortPlannedExercises(exercises: PlannedExercise[]): PlannedExercise[] {
-  return [...exercises].sort((a, b) => a.order - b.order);
-}
-
-function normalizeDayOrder(days: DayTemplate[]): DayTemplate[] {
-  return sortDays(days).map((day, index) => ({ ...day, order: index + 1 }));
-}
-
-function normalizePlannedExerciseOrder(exercises: PlannedExercise[]): PlannedExercise[] {
-  return sortPlannedExercises(exercises).map((item, index) => ({ ...item, order: index + 1 }));
-}
-
-function getExerciseName(exercises: Exercise[], exerciseId: string): string {
-  return exercises.find((exercise) => exercise.id === exerciseId)?.name ?? 'Unknown exercise';
-}
 
 export default function RoutinesScreen() {
   const [routines, setRoutines] = useState<RoutineTemplate[]>(() => listRoutines());
@@ -365,12 +353,15 @@ export default function RoutinesScreen() {
 
   return (
     <section className="page">
-      <div className="section-head">
-        <h1>Routines</h1>
+      <ScreenHeader
+        title="Routines"
+        subtitle="Build template days and exercise order"
+        action={
         <Button type="button" onClick={handleCreateRoutine}>
           Create Routine
         </Button>
-      </div>
+        }
+      />
 
       <div className="card form-stack">
         <h2 className="section-title">Routine Templates</h2>

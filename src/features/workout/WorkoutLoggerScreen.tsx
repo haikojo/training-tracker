@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../../components/Button';
+import { ScreenHeader } from '../../components/layout/ScreenHeader';
 import { listExercises } from '../../data/repos/exercisesRepo';
 import { getLastSessionForExercise, getSessionById, updateSession } from '../../data/repos/sessionsRepo';
 import { listRoutines } from '../../data/repos/routinesRepo';
@@ -49,6 +50,7 @@ export default function WorkoutLoggerScreen() {
   const routines = useMemo(() => listRoutines(), []);
 
   const [isFinishModalOpen, setIsFinishModalOpen] = useState(false);
+  const [recentlyAddedSetId, setRecentlyAddedSetId] = useState<string | null>(null);
   const [selectedDuration, setSelectedDuration] = useState(60);
   const [selectedEffort, setSelectedEffort] = useState<number | undefined>(undefined);
   const [showNotes, setShowNotes] = useState(false);
@@ -64,6 +66,15 @@ export default function WorkoutLoggerScreen() {
       setFinishNotes(nextSession.notes ?? '');
     }
   }, [sessionId]);
+
+  useEffect(() => {
+    if (!recentlyAddedSetId) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => setRecentlyAddedSetId(null), 500);
+    return () => window.clearTimeout(timeoutId);
+  }, [recentlyAddedSetId]);
 
   const exerciseNameMap = useMemo(() => {
     const nextMap = new Map<string, string>();
@@ -132,7 +143,11 @@ export default function WorkoutLoggerScreen() {
       ]
     }));
 
+    const updatedEntry = nextEntries.find((item) => item.id === entryId);
+    const addedSetId = updatedEntry?.sets[updatedEntry.sets.length - 1]?.id;
+
     persistEntries(nextEntries);
+    setRecentlyAddedSetId(addedSetId ?? null);
   }
 
   function copyLastSet(entryId: string): void {
@@ -164,7 +179,11 @@ export default function WorkoutLoggerScreen() {
       ]
     }));
 
+    const updatedEntry = nextEntries.find((item) => item.id === entryId);
+    const addedSetId = updatedEntry?.sets[updatedEntry.sets.length - 1]?.id;
+
     persistEntries(nextEntries);
+    setRecentlyAddedSetId(addedSetId ?? null);
   }
 
   function adjustReps(entryId: string, setId: string, delta: number): void {
@@ -264,7 +283,7 @@ export default function WorkoutLoggerScreen() {
   if (!sessionId) {
     return (
       <section className="page logger-page">
-        <h1>Workout Logger</h1>
+        <ScreenHeader title="Workout Logger" />
         <article className="card form-stack">
           <p className="form-error">Missing session id.</p>
           <Link className="inline-link" to="/start">
@@ -277,8 +296,8 @@ export default function WorkoutLoggerScreen() {
 
   if (!session) {
     return (
-      <section className="page">
-        <h1>Workout Logger</h1>
+      <section className="page logger-page">
+        <ScreenHeader title="Workout Logger" />
         <article className="card form-stack">
           <p className="form-error">Session not found.</p>
           <Link className="inline-link" to="/start">
@@ -291,9 +310,8 @@ export default function WorkoutLoggerScreen() {
 
   return (
     <>
-      <section className="page">
-        <h1>{session.name}</h1>
-        <p className="exercise-meta">{new Date(session.date).toLocaleString()}</p>
+      <section className="page logger-page">
+        <ScreenHeader title={session.name} subtitle={new Date(session.date).toLocaleString()} />
         {notice ? <article className="card exercise-meta">{notice}</article> : null}
 
         <div className="exercise-list" role="list">
@@ -304,6 +322,7 @@ export default function WorkoutLoggerScreen() {
               name={exerciseNameMap.get(entry.exerciseId) ?? 'Unknown exercise'}
               plannedTarget={formatPlannedTarget(plannedExerciseMap.get(entry.exerciseId) ?? undefined)}
               entry={entry}
+              recentlyAddedSetId={recentlyAddedSetId}
               canCopyLastSet={entry.sets.length > 0}
               onAddSet={addSet}
               onCopyLastSet={copyLastSet}

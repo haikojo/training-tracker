@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { ScreenHeader } from '../../components/layout/ScreenHeader';
+import { Pill } from '../../components/ui/Pill';
 import { listSessions } from '../../data/repos/sessionsRepo';
 import { sortSessionsNewestFirst } from './logic';
 
@@ -7,7 +9,15 @@ export default function HistoryListScreen() {
 
   return (
     <section className="page">
-      <h1>History</h1>
+      <ScreenHeader
+        title="History"
+        subtitle="Your completed sessions"
+        action={
+          <Link className="inline-link" to="/settings">
+            Settings
+          </Link>
+        }
+      />
 
       {sessions.length === 0 ? (
         <article className="card form-stack">
@@ -23,11 +33,10 @@ export default function HistoryListScreen() {
               <article className="card exercise-row history-row">
                 <p className="exercise-meta">{new Date(session.date).toLocaleString()}</p>
                 <p className="exercise-name">{session.name}</p>
-                <p className="exercise-meta">
-                  {session.durationMinutes !== undefined ? `${session.durationMinutes} min` : 'Duration -'}
-                  {' · '}
-                  {session.effort !== undefined ? `${session.effort}/10` : 'Effort -'}
-                </p>
+                <div className="history-meta-row">
+                  {session.durationMinutes !== undefined ? <Pill>{session.durationMinutes} min</Pill> : <Pill>Duration -</Pill>}
+                  {session.effort !== undefined ? <Pill tone="accent">{session.effort}/10</Pill> : <Pill>Effort -</Pill>}
+                </div>
               </article>
             </Link>
           ))}

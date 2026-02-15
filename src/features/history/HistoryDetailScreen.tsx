@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../../components/Button';
+import { ScreenHeader } from '../../components/layout/ScreenHeader';
+import { Pill } from '../../components/ui/Pill';
 import { addSession, getSessionById, removeSession } from '../../data/repos/sessionsRepo';
 import { listExercises } from '../../data/repos/exercisesRepo';
 import { buildRepeatSessionInput, getExerciseTotals, getSessionTotalVolume } from './logic';
@@ -72,19 +74,19 @@ export default function HistoryDetailScreen() {
 
   return (
     <section className="page">
-      <div className="section-head">
-        <h1>{session.name}</h1>
-        <Link className="inline-link" to="/history">
-          Back
-        </Link>
-      </div>
-      <p className="exercise-meta">{new Date(session.date).toLocaleString()}</p>
+      <ScreenHeader
+        title={session.name}
+        subtitle={new Date(session.date).toLocaleString()}
+        action={<Link className="inline-link" to="/history">Back</Link>}
+      />
 
       <article className="card form-stack">
-        {session.durationMinutes !== undefined ? <p>Duration: {session.durationMinutes} min</p> : null}
-        {session.effort !== undefined ? <p>Effort: {session.effort}/10</p> : null}
+        <div className="history-meta-row">
+          {session.durationMinutes !== undefined ? <Pill>{session.durationMinutes} min</Pill> : null}
+          {session.effort !== undefined ? <Pill tone="accent">{session.effort}/10</Pill> : null}
+          <Pill tone="success">Volume {sessionTotalVolume.toLocaleString()} kg</Pill>
+        </div>
         {session.notes ? <p>Notes: {session.notes}</p> : null}
-        <p>Total Volume: {sessionTotalVolume.toLocaleString()} kg</p>
       </article>
 
       <div className="exercise-list" role="list">

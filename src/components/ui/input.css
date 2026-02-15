@@ -1,0 +1,28 @@
+.ui-input-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.ui-input-label {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-weight: 560;
+}
+
+.ui-input {
+  width: 100%;
+  min-height: 44px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  padding: 0.7rem 0.82rem;
+  font-size: 1rem;
+  color: var(--text);
+  background: var(--field-bg);
+}
+
+.ui-input:focus-visible {
+  outline: 1px solid var(--focus-ring);
+  outline-offset: 1px;
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--focus-ring) 28%, transparent);
+}

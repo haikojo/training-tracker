@@ -7,6 +7,7 @@ interface ExerciseCardProps {
   name: string;
   plannedTarget: string | null;
   entry: SessionExercise;
+  recentlyAddedSetId?: string | null;
   canCopyLastSet: boolean;
   onAddSet: (entryId: string) => void;
   onCopyLastSet: (entryId: string) => void;
@@ -22,6 +23,7 @@ export function ExerciseCard({
   name,
   plannedTarget,
   entry,
+  recentlyAddedSetId = null,
   canCopyLastSet,
   onAddSet,
   onCopyLastSet,
@@ -37,7 +39,7 @@ export function ExerciseCard({
         <p className="exercise-name">
           {index + 1}. {name}
         </p>
-        {plannedTarget ? <p className="exercise-meta">{plannedTarget}</p> : null}
+        {plannedTarget ? <p className="exercise-meta planned-target">{plannedTarget}</p> : null}
       </div>
 
       <div className="row-actions">
@@ -55,6 +57,7 @@ export function ExerciseCard({
             key={set.id}
             set={set}
             index={setIndex}
+            isNew={set.id === recentlyAddedSetId}
             onAdjustReps={(setId, delta) => onAdjustReps(entry.id, setId, delta)}
             onAdjustWeight={(setId, delta) => onAdjustWeight(entry.id, setId, delta)}
             onManualReps={(setId, value) => onManualReps(entry.id, setId, value)}
